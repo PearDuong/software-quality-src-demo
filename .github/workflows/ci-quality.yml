@@ -1,0 +1,48 @@
+name: Software Quality CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+# Hủy các lượt chạy cũ khi có commit mới được push vào cùng nhánh/PR
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# Tuân thủ nguyên tắc đặc quyền tối thiểu 
+permissions:
+  contents: read
+
+jobs:
+  quality-check:
+    name: Code Quality & Security Scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies (Clean Install)
+        run: npm ci
+
+      - name: TypeScript Type Checking
+        run: npx tsc --noEmit
+
+      - name: Dependency Security Audit
+        run: npm audit --audit-level=high
+        continue-on-error: true
+
+      - name: Run Quality Tests
+        env:
+          CI: true
+        run: npm test --if-present
