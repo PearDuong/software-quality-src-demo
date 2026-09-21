@@ -10,6 +10,15 @@ export interface User {
   token?: string;
 }
 
+// Dữ liệu khi người dùng đăng ký tài khoản mới
+export interface RegisterData {
+  username: string;
+  password: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+}
+
 // Kiểu dữ liệu cho Context API
 export interface AuthContextType {
   user: User | null;              // Người dùng hiện tại đang đăng nhập
@@ -17,6 +26,8 @@ export interface AuthContextType {
   isLoading: boolean;            // Trạng thái đang tải dữ liệu
   error: string | null;          // Thông báo lỗi nếu có
   login: (username: string, password: string) => Promise<boolean>;
+  register: (data: RegisterData) => Promise<boolean>;
   logout: () => void;
   fetchUsers: () => Promise<void>; // Lấy danh sách users từ dummyjson.com/users
 }
+

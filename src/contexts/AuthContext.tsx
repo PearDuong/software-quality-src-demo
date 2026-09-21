@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { User, AuthContextType } from '../types/auth';
+import { User, AuthContextType, RegisterData } from '../types/auth';
 
 // =========================================================================
 // BƯỚC 1: Khởi tạo Context với giá trị mặc định là undefined
@@ -68,6 +68,56 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   // =======================================================================
+  // BƯỚC 3.5: Hàm đăng ký - Tạo tài khoản mới (POST /users/add)
+  // =======================================================================
+  const register = async (data: RegisterData): Promise<boolean> => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch('https://dummyjson.com/users/add', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'User-Agent': 'Mozilla/5.0',
+        },
+        body: JSON.stringify({
+          firstName: data.firstName.trim(),
+          lastName: data.lastName.trim(),
+          username: data.username.trim(),
+          email: data.email.trim(),
+          password: data.password,
+        }),
+      });
+
+      const resData = await response.json();
+
+      if (!response.ok) {
+        throw new Error(resData.message || 'Đăng ký không thành công!');
+      }
+
+      // Đăng ký thành công -> Khởi tạo User và tự động đăng nhập
+      const newUser: User = {
+        id: resData.id || Date.now(),
+        username: data.username.trim(),
+        email: data.email.trim(),
+        firstName: data.firstName.trim(),
+        lastName: data.lastName.trim(),
+        image: 'https://dummyjson.com/icon/' + data.username.trim() + '/128',
+        token: 'dummy-token-' + Date.now(),
+      };
+
+      setUser(newUser);
+      return true;
+    } catch (err: any) {
+      setError(err.message || 'Không thể đăng ký tài khoản.');
+      return false;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // =======================================================================
   // BƯỚC 4: Hàm lấy danh sách người dùng từ DummyJSON (GET /users)
   // =======================================================================
   const fetchUsers = async () => {
@@ -110,6 +160,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         isLoading,
         error,
         login,
+        register,
         logout,
         fetchUsers,
       }}

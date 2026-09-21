@@ -13,7 +13,11 @@ import { CustomInput } from '../components/CustomInput';
 import { CustomButton } from '../components/CustomButton';
 import { useAuth } from '../contexts/AuthContext';
 
-export const LoginScreen: React.FC = () => {
+interface LoginScreenProps {
+  onSwitchToRegister?: () => void;
+}
+
+export const LoginScreen: React.FC<LoginScreenProps> = ({ onSwitchToRegister }) => {
   // Lấy hàm login, isLoading và error từ AuthContext
   const { login, isLoading, error } = useAuth();
 
@@ -106,6 +110,16 @@ export const LoginScreen: React.FC = () => {
             iconName="log-in-outline"
             style={styles.loginBtn}
           />
+
+          {/* Link chuyển sang Đăng ký */}
+          {onSwitchToRegister ? (
+            <View style={styles.switchRow}>
+              <Text style={styles.switchText}>Chưa có tài khoản? </Text>
+              <TouchableOpacity onPress={onSwitchToRegister} activeOpacity={0.7}>
+                <Text style={styles.switchLink}>Đăng ký ngay</Text>
+              </TouchableOpacity>
+            </View>
+          ) : null}
         </View>
 
         {/* Hộp gợi ý tài khoản mẫu từ dummyjson.com */}
@@ -149,6 +163,9 @@ const styles = StyleSheet.create({
     paddingTop: 50,
     paddingBottom: 40,
     justifyContent: 'center',
+    maxWidth: 500,
+    alignSelf: 'center',
+    width: '100%',
   },
   header: {
     alignItems: 'center',
@@ -248,5 +265,20 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: '#64748B',
     marginTop: 2,
+  },
+  switchRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 18,
+  },
+  switchText: {
+    fontSize: 14,
+    color: '#64748B',
+  },
+  switchLink: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#2563EB',
   },
 });
