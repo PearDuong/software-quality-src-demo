@@ -14,7 +14,7 @@ type AuthMode = 'login' | 'register';
 type MainTab = 'products' | 'cart' | 'profile';
 
 const MainApp = () => {
-  const [activeTab, setActiveTab] = useState<MainTab>(123);
+  const [activeTab, setActiveTab] = useState<MainTab>('products');
   const { totalCount } = useCart();
 
   return (
